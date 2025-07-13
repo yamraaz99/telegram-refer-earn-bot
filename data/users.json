@@ -1,0 +1,37 @@
+{
+  "5329837605": {
+    "telegramId": "5329837605",
+    "username": "ExploringPeople",
+    "firstName": "Maths",
+    "lastName": "9:30",
+    "referralCode": "EOPLGS",
+    "referredBy": null,
+    "referredUsers": [],
+    "walletBalance": 5,
+    "upiId": "",
+    "hasJoinedChannel": true,
+    "channelJoinRewardClaimed": true,
+    "withdrawalRequests": [],
+    "isActive": true,
+    "createdAt": "2025-07-13T17:32:58.329Z",
+    "lastActive": "2025-07-13T17:39:24.997Z"
+  },
+  "6618880732": {
+    "telegramId": "6618880732",
+    "username": "",
+    "firstName": "Soul",
+    "lastName": "",
+    "referralCode": "71W9K0",
+    "referredBy": null,
+    "referredUsers": [],
+    "walletBalance": 5,
+    "upiId": "7905985400@fam",
+    "hasJoinedChannel": true,
+    "channelJoinRewardClaimed": true,
+    "withdrawalRequests": [],
+    "isActive": true,
+    "createdAt": "2025-07-13T17:34:05.096Z",
+    "lastActive": "2025-07-13T17:37:47.326Z",
+    "awaitingUpiInput": false
+  }
+}

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Telegram Refer Bot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(209, 213, 219, 0.3);
+        }
+        .sidebar-active {
+            transform: translateX(0);
+        }
+        .sidebar-inactive {
+            transform: translateX(-100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="gradient-bg shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <button id="sidebarToggle" class="text-white hover:text-gray-200 focus:outline-none focus:text-gray-200 md:hidden">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div class="flex-shrink-0 flex items-center ml-4 md:ml-0">
+                        <i class="fas fa-robot text-white text-2xl mr-3"></i>
+                        <h1 class="text-white text-xl font-bold">Telegram Bot Admin</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-white text-sm">Welcome, Admin</span>
+                    <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-200">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar-inactive md:sidebar-active fixed md:static inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out">
+            <div class="p-6">
+                <nav class="space-y-2">
+                    <a href="#" onclick="showSection('dashboard')" class="nav-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition duration-200">
+                        <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                    </a>
+                    <a href="#" onclick="showSection('users')" class="nav-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition duration-200">
+                        <i class="fas fa-users mr-3"></i>Users
+                    </a>
+                    <a href="#" onclick="showSection('withdrawals')" class="nav-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition duration-200">
+                        <i class="fas fa-money-bill-wave mr-3"></i>Withdrawals
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="section">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Dashboard Overview</h2>
+                    <p class="text-gray-600">Monitor your bot's performance and user activity</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="glass-effect rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Total Users</p>
+                                <p id="totalUsers" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-effect rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-user-check text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Active Users</p>
+                                <p id="activeUsers" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-effect rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                <i class="fas fa-share-alt text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Total Referrals</p>
+                                <p id="totalReferrals" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-effect rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <i class="fas fa-clock text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Pending Withdrawals</p>
+                                <p id="pendingWithdrawals" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Stats -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-effect rounded-xl p-6 shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-wallet mr-2 text-green-600"></i>Wallet Statistics
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Wallet Balance:</span>
+                                <span id="totalWalletBalance" class="font-semibold text-green-600">₹0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Pending Withdrawal Amount:</span>
+                                <span id="pendingWithdrawalAmount" class="font-semibold text-yellow-600">₹0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-effect rounded-xl p-6 shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-chart-line mr-2 text-blue-600"></i>Quick Actions
+                        </h3>
+                        <div class="space-y-3">
+                            <button onclick="refreshStats()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                                <i class="fas fa-sync-alt mr-2"></i>Refresh Stats
+                            </button>
+                            <button onclick="showSection('withdrawals')" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                                <i class="fas fa-money-bill-wave mr-2"></i>View Withdrawals
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div id="usersSection" class="section hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">User Management</h2>
+                    <p class="text-gray-600">View and manage all registered users</p>
+                </div>
+
+                <div class="glass-effect rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+                            <h3 class="text-lg font-semibold text-gray-800">All Users</h3>
+                            <button onclick="loadUsers()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                                <i class="fas fa-sync-alt mr-2"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referrals</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wallet</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UPI ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdrawals Section -->
+            <div id="withdrawalsSection" class="section hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Withdrawal Requests</h2>
+                    <p class="text-gray-600">Manage user withdrawal requests</p>
+                </div>
+
+                <div class="glass-effect rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+                            <h3 class="text-lg font-semibold text-gray-800">Withdrawal Requests</h3>
+                            <button onclick="loadWithdrawals()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                                <i class="fas fa-sync-alt mr-2"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UPI ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="withdrawalsTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Withdrawals will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Details Modal -->
+    <div id="userModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">User Details</h3>
+                    <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="userModalContent">
+                    <!-- User details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = localStorage.getItem('adminToken');
+        
+        // Check authentication
+        if (!currentToken) {
+            window.location.href = '/';
+        }
+
+        // API helper function
+        async function apiCall(endpoint, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`,
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            };
+            
+            const response = await fetch(endpoint, { ...options, ...defaultOptions });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('adminToken');
+                window.location.href = '/';
+                return;
+            }
+            
+            return response.json();
+        }
+
+        // Navigation functions
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + 'Section').classList.remove('hidden');
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('bg-blue-50', 'text-blue-600');
+            });
+            
+            // Load section data
+            switch(sectionName) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'withdrawals':
+                    loadWithdrawals();
+                    break;
+            }
+            
+            // Close sidebar on mobile
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.remove('sidebar-active');
+                document.getElementById('sidebar').classList.add('sidebar-inactive');
+            }
+        }
+
+        // Load dashboard stats
+        async function loadDashboard() {
+            try {
+                const data = await apiCall('/api/admin/stats');
+                if (data.success) {
+                    document.getElementById('totalUsers').textContent = data.data.totalUsers;
+                    document.getElementById('activeUsers').textContent = data.data.activeUsers;
+                    document.getElementById('totalReferrals').textContent = data.data.totalReferrals;
+                    document.getElementById('pendingWithdrawals').textContent = data.data.pendingWithdrawals;
+                    document.getElementById('totalWalletBalance').textContent = '₹' + data.data.totalWalletBalance;
+                    document.getElementById('pendingWithdrawalAmount').textContent = '₹' + data.data.pendingWithdrawalAmount;
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Load users
+        async function loadUsers() {
+            try {
+                const data = await apiCall('/api/admin/users');
+                if (data.success) {
+                    const tbody = document.getElementById('usersTableBody');
+                    tbody.innerHTML = '';
+                    
+                    data.data.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <i class="fas fa-user text-blue-600"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">${user.firstName} ${user.lastName}</div>
+                                        <div class="text-sm text-gray-500">@${user.username || 'N/A'}</div>
+                                        <div class="text-xs text-gray-400">ID: ${user.telegramId}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.referredUsers.length}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${user.walletBalance}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.upiId || 'Not Set'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                    ${user.isActive ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="viewUser('${user.telegramId}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button onclick="editBalance('${user.telegramId}', ${user.walletBalance})" class="text-green-600 hover:text-green-900">
+                                    <i class="fas fa-edit"></i> Edit Balance
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Load withdrawals
+        async function loadWithdrawals() {
+            try {
+                const data = await apiCall('/api/admin/withdrawals');
+                if (data.success) {
+                    const tbody = document.getElementById('withdrawalsTableBody');
+                    tbody.innerHTML = '';
+                    
+                    data.data.forEach(withdrawal => {
+                        const row = document.createElement('tr');
+                        const statusColor = withdrawal.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                          withdrawal.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                        
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">${withdrawal.firstName} ${withdrawal.lastName}</div>
+                                <div class="text-sm text-gray-500">@${withdrawal.username || 'N/A'}</div>
+                                <div class="text-xs text-gray-400">ID: ${withdrawal.telegramId}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${withdrawal.amount}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${withdrawal.upiId}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${new Date(withdrawal.requestDate).toLocaleDateString()}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
+                                    ${withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                ${withdrawal.status === 'pending' ? `
+                                    <button onclick="processWithdrawal('${withdrawal.telegramId}', ${withdrawal.requestIndex}, 'approve')" class="text-green-600 hover:text-green-900 mr-3">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button onclick="processWithdrawal('${withdrawal.telegramId}', ${withdrawal.requestIndex}, 'decline')" class="text-red-600 hover:text-red-900">
+                                        <i class="fas fa-times"></i> Decline
+                                    </button>
+                                ` : `
+                                    <span class="text-gray-500">Processed</span>
+                                `}
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading withdrawals:', error);
+            }
+        }
+
+        // View user details
+        async function viewUser(telegramId) {
+            try {
+                const data = await apiCall(`/api/admin/users/${telegramId}`);
+                if (data.success) {
+                    const user = data.data;
+                    document.getElementById('userModalContent').innerHTML = `
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                                    <p class="mt-1 text-sm text-gray-900">${user.firstName} ${user.lastName}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Username</label>
+                                    <p class="mt-1 text-sm text-gray-900">@${user.username || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Telegram ID</label>
+                                    <p class="mt-1 text-sm text-gray-900">${user.telegramId}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Referral Code</label>
+                                    <p class="mt-1 text-sm text-gray-900">${user.referralCode}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Wallet Balance</label>
+                                    <p class="mt-1 text-sm text-gray-900">₹${user.walletBalance}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Total Referrals</label>
+                                    <p class="mt-1 text-sm text-gray-900">${user.referredUsers.length}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">UPI ID</label>
+                                    <p class="mt-1 text-sm text-gray-900">${user.upiId || 'Not Set'}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Joined Date</label>
+                                    <p class="mt-1 text-sm text-gray-900">${new Date(user.createdAt).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Withdrawal History</label>
+                                <div class="max-h-40 overflow-y-auto">
+                                    ${user.withdrawalRequests.length > 0 ? user.withdrawalRequests.map(req => `
+                                        <div class="border rounded p-2 mb-2">
+                                            <div class="flex justify-between">
+                                                <span>₹${req.amount}</span>
+                                                <span class="text-sm ${req.status === 'approved' ? 'text-green-600' : req.status === 'declined' ? 'text-red-600' : 'text-yellow-600'}">${req.status}</span>
+                                            </div>
+                                            <div class="text-xs text-gray-500">${new Date(req.requestDate).toLocaleDateString()}</div>
+                                        </div>
+                                    `).join('') : '<p class="text-gray-500">No withdrawal history</p>'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('userModal').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading user details:', error);
+            }
+        }
+
+        // Close user modal
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+        }
+
+        // Edit user balance
+        function editBalance(telegramId, currentBalance) {
+            const action = prompt('Enter action (add/subtract):');
+            if (!action || !['add', 'subtract'].includes(action)) {
+                alert('Invalid action. Please enter "add" or "subtract".');
+                return;
+            }
+            
+            const amount = prompt(`Enter amount to ${action}:`);
+            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+                alert('Invalid amount.');
+                return;
+            }
+            
+            updateUserBalance(telegramId, parseFloat(amount), action);
+        }
+
+        // Update user balance
+        async function updateUserBalance(telegramId, amount, action) {
+            try {
+                const data = await apiCall(`/api/admin/users/${telegramId}/balance`, {
+                    method: 'POST',
+                    body: JSON.stringify({ amount, action })
+                });
+                
+                if (data.success) {
+                    alert(`Balance ${action}ed successfully! New balance: ₹${data.newBalance}`);
+                    loadUsers();
+                } else {
+                    alert('Error updating balance: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error updating balance:', error);
+                alert('Error updating balance');
+            }
+        }
+
+        // Process withdrawal
+        async function processWithdrawal(telegramId, requestIndex, action) {
+            const adminNote = prompt(`Enter admin note for ${action}:`);
+            
+            try {
+                const data = await apiCall(`/api/admin/withdrawals/${telegramId}/${requestIndex}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ action, adminNote })
+                });
+                
+                if (data.success) {
+                    alert(`Withdrawal ${action}d successfully!`);
+                    loadWithdrawals();
+                    loadDashboard();
+                } else {
+                    alert('Error processing withdrawal: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error processing withdrawal:', error);
+                alert('Error processing withdrawal');
+            }
+        }
+
+        // Refresh stats
+        function refreshStats() {
+            loadDashboard();
+        }
+
+        // Event listeners
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('sidebar-active');
+            sidebar.classList.toggle('sidebar-inactive');
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('adminToken');
+            window.location.href = '/';
+        });
+
+        // Initialize
+        showSection('dashboard');
+    </script>
+</body>
+</html>
+

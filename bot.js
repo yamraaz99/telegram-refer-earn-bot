@@ -216,6 +216,27 @@ bot.on("message", async (msg) => {
       return;
     }
 
+    // Check if user is setting UPI ID
+    if (user.awaitingUpiInput) {
+      // Relaxed UPI ID pattern: allows numbers at the beginning of the username part
+      const upiPattern = /^[a-zA-Z0-9.\-_]+@[a-zA-Z0-9.\-_]+$/;
+      if (upiPattern.test(text)) {
+        await db.updateUser(userId, {
+          upiId: text,
+          awaitingUpiInput: false, // Reset the flag after saving
+        });
+        bot.sendMessage(chatId, `✅ UPI ID set successfully: ${text}`);
+        showMainMenu(chatId);
+      } else {
+        bot.sendMessage(
+          chatId,
+          `❌ Invalid UPI ID format. Please enter a valid UPI ID like:\n` +
+            `yourname@paytm, 1234567890@ybl, etc.`
+        );
+      }
+      return; // Important: return after handling UPI input
+    }
+
     switch (text) {
       case "🔗 Get Referral Link":
         const referralLink = `https://t.me/Referandearnmoney_free_bot?start=${user.referralCode}`;
@@ -251,7 +272,7 @@ bot.on("message", async (msg) => {
         bot.sendMessage(
           chatId,
           `💳 Please enter your UPI ID:\n\n` +
-            `Example: yourname@paytm, yourname@phonepe, etc.\n\n` +
+            `Example: yourname@paytm, 1234567890@ybl, etc.\n\n` +
             `This will be used for withdrawals.`
         );
 
@@ -278,26 +299,8 @@ bot.on("message", async (msg) => {
         break;
 
       default:
-        // Check if user is setting UPI ID
-        if (user.awaitingUpiInput) {
-          const upiPattern = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
-          if (upiPattern.test(text)) {
-            await db.updateUser(userId, {
-              upiId: text,
-              awaitingUpiInput: false,
-            });
-            bot.sendMessage(chatId, `✅ UPI ID set successfully: ${text}`);
-            showMainMenu(chatId);
-          } else {
-            bot.sendMessage(
-              chatId,
-              `❌ Invalid UPI ID format. Please enter a valid UPI ID like:\n` +
-                `yourname@paytm, yourname@phonepe, etc.`
-            );
-          }
-        } else {
-          showMainMenu(chatId);
-        }
+        // If not a command and not awaiting UPI input, just show main menu
+        showMainMenu(chatId);
         break;
     }
   }
